@@ -23,6 +23,10 @@ Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/
 mvn spring-boot:run
 ```
 
+## To view Swagger 2 API docs
+
+Run the server and browse to localhost:8090/swagger-ui.html
+
 ## Deploying the application to OpenShift
 
 The easiest way to deploy the sample application to OpenShift is to use the [OpenShift CLI](https://docs.openshift.org/latest/cli_reference/index.html):
