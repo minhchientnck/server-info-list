@@ -27,6 +27,7 @@ mvn spring-boot:run
 
 Run the server and browse to localhost:8090/swagger-ui.html
 
+
 ## Deploying the application to OpenShift
 
 The easiest way to deploy the sample application to OpenShift is to use the [OpenShift CLI](https://docs.openshift.org/latest/cli_reference/index.html):
