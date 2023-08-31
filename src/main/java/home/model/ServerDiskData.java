@@ -26,15 +26,15 @@ public class ServerDiskData implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Column(name = "nvme")
+	@Column(name = "nvme", length = 500)
 	private List<Integer> nvme;
 	
-	@Column(name = "sata")
+	@Column(name = "sata", length = 500)
 	private List<Integer> sata;
 	
-	@Column(name = "hdd")
+	@Column(name = "hdd", length = 500)
 	private List<Integer> hdd;
 	
-	@Column(name = "general")
+	@Column(name = "general", length = 500)
 	private List<Integer> general;
 }

@@ -10,14 +10,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import home.dtos.PaginationDto;
+import home.dtos.SearchDto;
 import home.dtos.ServerInfoDto;
 import home.exception.NotFoundException;
 import home.model.ServerDiskData;
@@ -98,35 +100,26 @@ public class ServerInfoService {
 		return 0;
 	}
 
+	public PaginationDto<ServerInfoDto> findBySearch(SearchDto searchDto, Pageable pageable) {
+		return serverInfoRepository.findBySearchDto(searchDto, pageable);
+	}
+
 	public List<ServerInfoDto> findAllServerInfo() {
 		List<ServerInfo> infos = (List<ServerInfo>) serverInfoRepository.findAll();
 		return mapServerInfoListToDtos(infos);
 	}
-	
-	public List<ServerInfoDto> findServerInfoFilterByName(String name) {
-		List<ServerInfo> infos = serverInfoRepository.findByNameLike(name);
-		return mapServerInfoListToDtos(infos);
-	}
-	
+
 	public ServerInfoDto findServerInfoByInfoId(Long infoId) {
 		ServerInfo info = serverInfoRepository.findByInfoId(infoId);
-		if(Optional.ofNullable(info).isEmpty()) {
-			String message = MessageFormat.format("Not found server info with {0}",
-					String.valueOf(infoId));
+		if (Optional.ofNullable(info).isEmpty()) {
+			String message = MessageFormat.format("Not found server info with {0}", String.valueOf(infoId));
 			LOG.error(message);
 			throw new NotFoundException(message);
 		}
 		return new ServerInfoDto(info);
 	}
-	
-	public List<ServerInfoDto> findServerInfoByCpu(String cpu) {
-		List<ServerInfo> infos = serverInfoRepository.findByCpuLike(cpu);
-		return mapServerInfoListToDtos(infos);
-	}
-	
+
 	private List<ServerInfoDto> mapServerInfoListToDtos(List<ServerInfo> infos) {
-		return infos.stream()
-			.map(info -> new ServerInfoDto(info))
-			.collect(Collectors.toList());
+		return infos.stream().map(info -> new ServerInfoDto(info)).collect(Collectors.toList());
 	}
 }

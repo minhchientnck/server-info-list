@@ -1,17 +1,19 @@
 package home.controller;
 
 import java.io.IOException;
-import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import home.dtos.PaginationDto;
+import home.dtos.SearchDto;
 import home.dtos.ServerInfoDto;
-import home.model.ServerInfo;
 import home.payload.ResponsePayload;
 import home.service.ServerInfoService;
 import io.swagger.annotations.ApiOperation;
@@ -38,31 +40,14 @@ public class ApiController {
 		return ResponseEntity.ok().body(response);
 	}
 
-	@GetMapping(value = "${api.url.findAll}")
-	@ApiOperation(value = "find all data", notes = "Returns HTTP 404 if list is failed")
+	@PostMapping(value = "${api.url.findBySearch}")
+	@ApiOperation(value = "Search data", notes = "Returns HTTP 404 if list is failed")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "susscess"),
 			@ApiResponse(code = 404, message = "failed") })
-	public ResponseEntity<List<ServerInfoDto>> findAllServerInfo() {
-		List<ServerInfoDto> serverInfoDtos = serverInfoService.findAllServerInfo();
+	public ResponseEntity<PaginationDto<ServerInfoDto>> findBySearch(@RequestBody SearchDto searchDto,
+			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "15") int size) {
+		Pageable paging = PageRequest.of(page, size);
+		PaginationDto<ServerInfoDto> serverInfoDtos = serverInfoService.findBySearch(searchDto, paging);
 		return ResponseEntity.ok().body(serverInfoDtos);
 	}
-
-	@PostMapping(value = "${api.url.filterByName}")
-	public ResponseEntity<List<ServerInfoDto>> filterServerInfoByName(@RequestBody String name) {
-		List<ServerInfoDto> serverInfoDtos = serverInfoService.findServerInfoFilterByName(name);
-		return ResponseEntity.ok().body(serverInfoDtos);
-	}
-	
-	@PostMapping(value = "${api.url.filterByCpu}")
-	public ResponseEntity<List<ServerInfoDto>> filterServerInfoByCpu(@RequestBody String cpu) {
-		List<ServerInfoDto> serverInfoDtos = serverInfoService.findServerInfoByCpu(cpu);
-		return ResponseEntity.ok().body(serverInfoDtos);
-	}
-	
-	@GetMapping(value = "${api.url.findByInfoId}")
-	public ResponseEntity<ServerInfoDto> filterServerInfoByInfoId(@PathVariable Long infoId) {
-		ServerInfoDto serverInfoDto = serverInfoService.findServerInfoByInfoId(infoId);
-		return ResponseEntity.ok().body(serverInfoDto);
-	}
-	
 }

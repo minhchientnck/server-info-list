@@ -38,10 +38,10 @@ public class ServerInfo implements Serializable {
 	@Column(name = "name")
 	private String name;
 	
-	@Column(name = "description")
+	@Column(name = "description", length = 500)
 	private List<String> description;
 	
-	@Column(name = "information")
+	@Column(name = "information", length = 500)
 	private List<String> information;
 	
 	@Column(name = "category")
@@ -65,7 +65,7 @@ public class ServerInfo implements Serializable {
 	@Column(name = "bandwidth")
 	private Integer bandwidth;
 	
-	@Column(name = "ram")
+	@Column(name = "ram", length = 500)
 	private List<String> ram;
 	
 	@Column(name = "ram_size")
@@ -77,10 +77,10 @@ public class ServerInfo implements Serializable {
 	@Column(name = "setup_price")
 	private Double setupPrice;
 	
-	@Column(name = "hdd_arr")
+	@Column(name = "hdd_arr", length = 500)
 	private List<String> hddArr;
 
-	@Column(name = "hdd_hr")
+	@Column(name = "hdd_hr", length = 500)
 	private List<String> hddHr;
 	
 	@Column(name = "hdd_size")
@@ -102,10 +102,10 @@ public class ServerInfo implements Serializable {
 	@Column(name = "datacenter_hr")
 	private String datacenterHr;
 	
-	@Column(name = "specials")
+	@Column(name = "specials", length = 500)
 	private List<String> specials;
 	
-	@Column(name = "dist")
+	@Column(name = "dist", length = 500)
 	private List<String> dist;
 	
 	@Column(name = "fixed_price")
