@@ -5,8 +5,12 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import home.dtos.ServerInfoDto;
 import home.model.ServerInfo;
 import home.payload.ResponsePayload;
 import home.service.ServerInfoService;
@@ -23,28 +27,42 @@ public class ApiController {
 		this.serverInfoService = serverInfoService;
 	}
 
-	@GetMapping(value = "${api.url.syncData}")
-	@ApiOperation(value = "Synchronize data", notes = "Returns HTTP 404 if list is failed")
+	@GetMapping(value = "${api.url.fetchData}")
+	@ApiOperation(value = "fetch data", notes = "Returns HTTP 404 if list is failed")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "susscess"),
 			@ApiResponse(code = 404, message = "failed") })
-	public ResponseEntity<?> SynchronizedData() throws IOException {
-		int rows = serverInfoService.syncData();
-		ResponsePayload response = new ResponsePayload().setKeyValue("message", "Synchronized data successfully")
+	public ResponseEntity<?> fetchData() throws IOException {
+		int rows = serverInfoService.fetchData();
+		ResponsePayload response = new ResponsePayload().setKeyValue("message", "fetched data successfully")
 				.setKeyValue("total", rows).build();
 		return ResponseEntity.ok().body(response);
 	}
 
-	@GetMapping(value = "${api.url.findAllServerInfo}")
+	@GetMapping(value = "${api.url.findAll}")
 	@ApiOperation(value = "find all data", notes = "Returns HTTP 404 if list is failed")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "susscess"),
 			@ApiResponse(code = 404, message = "failed") })
-	public ResponseEntity<?> findAllServerInfo() {
-		List<ServerInfo> infos = serverInfoService.findAllServerInfo();
-		return ResponseEntity.ok().body(infos);
+	public ResponseEntity<List<ServerInfoDto>> findAllServerInfo() {
+		List<ServerInfoDto> serverInfoDtos = serverInfoService.findAllServerInfo();
+		return ResponseEntity.ok().body(serverInfoDtos);
+	}
+
+	@PostMapping(value = "${api.url.filterByName}")
+	public ResponseEntity<List<ServerInfoDto>> filterServerInfoByName(@RequestBody String name) {
+		List<ServerInfoDto> serverInfoDtos = serverInfoService.findServerInfoFilterByName(name);
+		return ResponseEntity.ok().body(serverInfoDtos);
 	}
 	
-	@GetMapping(value = "${api.url.filterServerInfoByName}")
-	public ResponseEntity<?> filterServerInfoByName() {
-		return null;
+	@PostMapping(value = "${api.url.filterByCpu}")
+	public ResponseEntity<List<ServerInfoDto>> filterServerInfoByCpu(@RequestBody String cpu) {
+		List<ServerInfoDto> serverInfoDtos = serverInfoService.findServerInfoByCpu(cpu);
+		return ResponseEntity.ok().body(serverInfoDtos);
 	}
+	
+	@GetMapping(value = "${api.url.findByInfoId}")
+	public ResponseEntity<ServerInfoDto> filterServerInfoByInfoId(@PathVariable Long infoId) {
+		ServerInfoDto serverInfoDto = serverInfoService.findServerInfoByInfoId(infoId);
+		return ResponseEntity.ok().body(serverInfoDto);
+	}
+	
 }

@@ -3,10 +3,14 @@ package home.service;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -14,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import home.dtos.ServerInfoDto;
+import home.exception.NotFoundException;
 import home.model.ServerDiskData;
 import home.model.ServerInfo;
 import home.repository.ServerInfoRepository;
@@ -32,8 +38,9 @@ public class ServerInfoService {
 		this.serverInfoRepository = serverInfoRepository;
 	}
 
-	public int syncData() throws IOException {
+	public int fetchData() throws IOException {
 		URL url = new URL(resourceUrl);
+		LOG.info("Start fetching...");
 		String json = IOUtils.toString(url, Charset.forName("UTF-8"));
 		JSONObject object = new JSONObject(json);
 		JSONArray array = new JSONArray(object.get("server").toString());
@@ -51,7 +58,7 @@ public class ServerInfoService {
 			serverInfo.setDatacenterHr(JsonUtil.getString(info, "datacenter_hr"));
 			serverInfo.setDescription(JsonUtil.jsonObjectToList(info.get("description")));
 			serverInfo.setDist(JsonUtil.jsonObjectToList(info.get("dist")));
-			serverInfo.setFixedPrice(JsonUtil.getBoolean(info, "get"));
+			serverInfo.setFixedPrice(JsonUtil.getBoolean(info, "fixed_price"));
 			serverInfo.setHddArr(JsonUtil.jsonObjectToList(info.get("hdd_hr")));
 			serverInfo.setHddCount(JsonUtil.getInt(info, "hdd_count"));
 			serverInfo.setHddHr(JsonUtil.jsonObjectToList(info.get("hdd_hr")));
@@ -91,15 +98,35 @@ public class ServerInfoService {
 		return 0;
 	}
 
-	public List<ServerInfo> findAllServerInfo() {
-		return (List<ServerInfo>) serverInfoRepository.findAll();
+	public List<ServerInfoDto> findAllServerInfo() {
+		List<ServerInfo> infos = (List<ServerInfo>) serverInfoRepository.findAll();
+		return mapServerInfoListToDtos(infos);
 	}
 	
-	public List<ServerInfo> findServerInfoFilterByName(String name) {
-		return serverInfoRepository.findByNameLike(name);
+	public List<ServerInfoDto> findServerInfoFilterByName(String name) {
+		List<ServerInfo> infos = serverInfoRepository.findByNameLike(name);
+		return mapServerInfoListToDtos(infos);
 	}
 	
-	public List<ServerInfo> findServerInfoById(String infoId) {
-		return serverInfoRepository.findByInfoId(infoId);
+	public ServerInfoDto findServerInfoByInfoId(Long infoId) {
+		ServerInfo info = serverInfoRepository.findByInfoId(infoId);
+		if(Optional.ofNullable(info).isEmpty()) {
+			String message = MessageFormat.format("Not found server info with {0}",
+					String.valueOf(infoId));
+			LOG.error(message);
+			throw new NotFoundException(message);
+		}
+		return new ServerInfoDto(info);
+	}
+	
+	public List<ServerInfoDto> findServerInfoByCpu(String cpu) {
+		List<ServerInfo> infos = serverInfoRepository.findByCpuLike(cpu);
+		return mapServerInfoListToDtos(infos);
+	}
+	
+	private List<ServerInfoDto> mapServerInfoListToDtos(List<ServerInfo> infos) {
+		return infos.stream()
+			.map(info -> new ServerInfoDto(info))
+			.collect(Collectors.toList());
 	}
 }
