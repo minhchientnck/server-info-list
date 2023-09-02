@@ -41,7 +41,7 @@ public class ServerInfoDaoImpl implements ServerInfoDao {
 		}
 
 		if (searchDto.getKey() != null) {
-			predicates.add(builder.equal(serverInfo.get("key"), searchDto.getKey()));
+			predicates.add(builder.equal(serverInfo.get("keyNum"), searchDto.getKey()));
 		}
 
 		if (searchDto.getName() != null) {

@@ -7,7 +7,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -104,11 +103,6 @@ public class ServerInfoService {
 		return serverInfoRepository.findBySearchDto(searchDto, pageable);
 	}
 
-	public List<ServerInfoDto> findAllServerInfo() {
-		List<ServerInfo> infos = (List<ServerInfo>) serverInfoRepository.findAll();
-		return mapServerInfoListToDtos(infos);
-	}
-
 	public ServerInfoDto findServerInfoByInfoId(Long infoId) {
 		ServerInfo info = serverInfoRepository.findByInfoId(infoId);
 		if (Optional.ofNullable(info).isEmpty()) {
@@ -117,9 +111,5 @@ public class ServerInfoService {
 			throw new NotFoundException(message);
 		}
 		return new ServerInfoDto(info);
-	}
-
-	private List<ServerInfoDto> mapServerInfoListToDtos(List<ServerInfo> infos) {
-		return infos.stream().map(info -> new ServerInfoDto(info)).collect(Collectors.toList());
 	}
 }

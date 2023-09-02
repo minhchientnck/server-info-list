@@ -94,7 +94,6 @@ public class ApiControllerTest {
 		paginationDto.setData(dtos);
 		
 		Mockito.when(serverInfoService.findBySearch(any(), any())).thenReturn(paginationDto);
-		
 		mockMvc.perform(post(searchUrl+"?page=1&size=15")
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(JsonUtil.toJsonString(searchDto)))
