@@ -1,6 +1,7 @@
 package home.controller;
 
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -8,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,8 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,9 +41,8 @@ public class ApiControllerTest {
 	@InjectMocks
 	private ApiController apiController;
 
-	private String rootPath = "/api";
-	private String fetchDataUrl = "/fetchData";
-	private String searchUrl = "/search";
+	private String fetchDataUrl = "/api/fetchData";
+	private String searchUrl = "/api/search";
 
 	private String domainName = "/domainName";
 	private String referer;
@@ -52,6 +50,7 @@ public class ApiControllerTest {
 	@Before
 	public void setUp() throws Exception {
 		mockMvc = MockMvcBuilders.standaloneSetup(apiController)
+				.defaultRequest(null)
 				.addPlaceholderValue("api.url.fetchData", fetchDataUrl)
 				.addPlaceholderValue("api.url.findBySearch", searchUrl)
 				.build();
@@ -61,8 +60,7 @@ public class ApiControllerTest {
 	@Test
 	public void testFetchDataAndUpdate() throws Exception {
 		Mockito.when(serverInfoService.fetchData()).thenReturn(2);
-		String url = rootPath + fetchDataUrl;
-		mockMvc.perform(get(url)
+		mockMvc.perform(get(fetchDataUrl)
 				.header("referer", referer))
 				.andExpect(status().isOk());
 	}
@@ -70,8 +68,7 @@ public class ApiControllerTest {
 	@Test
 	public void testFetchDataNoUpdate() throws Exception {
 		Mockito.when(serverInfoService.fetchData()).thenReturn(0);
-		String url = rootPath + fetchDataUrl;
-		mockMvc.perform(get(url)
+		mockMvc.perform(get(fetchDataUrl)
 				.header("referer", referer))
 				.andExpect(status().isOk());
 	}
@@ -83,24 +80,23 @@ public class ApiControllerTest {
 		searchDto.setKey(456L);
 		searchDto.setCpu("Cpu");
 		
-		Pageable paging = PageRequest.of(1, 10);
-		PaginationDto<ServerInfoDto> serverInfoDtos = new PaginationDto<>();
-		serverInfoDtos.setTotalPage(1);
-		serverInfoDtos.setPage(1);
-		serverInfoDtos.setSize(1);
+		PaginationDto<ServerInfoDto> paginationDto = new PaginationDto<>();
+		paginationDto.setTotalPage(1);
+		paginationDto.setPage(1);
+		paginationDto.setSize(1);
 		
 		List<ServerInfoDto> dtos = new ArrayList<>();
 		ServerInfoDto dto = new ServerInfoDto();
-		dto.setId(1L);
-		dto.setKey(1L);
+		dto.setId(123L);
+		dto.setKey(456L);
+		dto.setCpu("Cpu");
 		dtos.add(dto);
-		serverInfoDtos.setData(dtos);
+		paginationDto.setData(dtos);
 		
-		Mockito.when(serverInfoService.findBySearch(searchDto, paging)).thenReturn(serverInfoDtos);
-		String url = rootPath + searchUrl;
+		Mockito.when(serverInfoService.findBySearch(any(), any())).thenReturn(paginationDto);
 		
-		mockMvc.perform(post(url)
-				.header("referer", referer)
+		mockMvc.perform(post(searchUrl+"?page=1&size=15")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(JsonUtil.toJsonString(searchDto)))
 				.andExpect(status().isOk());
 	}

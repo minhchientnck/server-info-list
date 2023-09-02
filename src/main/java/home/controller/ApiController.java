@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,7 @@ public class ApiController {
 		this.serverInfoService = serverInfoService;
 	}
 
-	@GetMapping(value = "${api.url.fetchData}")
+	@GetMapping(value = "${api.url.fetchData}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "fetch data", notes = "Returns HTTP 404 if list is failed")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "susscess"),
 			@ApiResponse(code = 404, message = "failed") })
@@ -40,7 +41,7 @@ public class ApiController {
 		return ResponseEntity.ok().body(response);
 	}
 
-	@PostMapping(value = "${api.url.findBySearch}")
+	@PostMapping(value = "${api.url.findBySearch}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Search data", notes = "Returns HTTP 404 if list is failed")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "susscess"),
 			@ApiResponse(code = 404, message = "failed") })
