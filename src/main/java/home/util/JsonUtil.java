@@ -5,10 +5,17 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class JsonUtil {
 
 	/**
 	 * jsonObjectToList
+	 * 
 	 * @param <T>
 	 * @param o
 	 * @return
@@ -31,6 +38,7 @@ public class JsonUtil {
 
 	/**
 	 * getString
+	 * 
 	 * @param object
 	 * @param name
 	 * @param defaultValue
@@ -50,6 +58,7 @@ public class JsonUtil {
 
 	/**
 	 * getString
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -79,6 +88,7 @@ public class JsonUtil {
 
 	/**
 	 * getLong
+	 * 
 	 * @param object
 	 * @param name
 	 * @param defaultValue
@@ -98,6 +108,7 @@ public class JsonUtil {
 
 	/**
 	 * getLong
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -108,6 +119,7 @@ public class JsonUtil {
 
 	/**
 	 * getInt
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -118,6 +130,7 @@ public class JsonUtil {
 
 	/**
 	 * getBoolean
+	 * 
 	 * @param object
 	 * @param name
 	 * @param defaultValue
@@ -137,6 +150,7 @@ public class JsonUtil {
 
 	/**
 	 * getBoolean
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -147,6 +161,7 @@ public class JsonUtil {
 
 	/**
 	 * getDouble
+	 * 
 	 * @param object
 	 * @param name
 	 * @param defaultValue
@@ -163,9 +178,10 @@ public class JsonUtil {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
 	 * getDouble
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -173,9 +189,10 @@ public class JsonUtil {
 	public static Double getDouble(JSONObject object, String name) {
 		return getDouble(object, name, null);
 	}
-	
+
 	/**
 	 * getJSONObject
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -194,6 +211,7 @@ public class JsonUtil {
 
 	/**
 	 * getJSONArray
+	 * 
 	 * @param object
 	 * @param name
 	 * @return
@@ -208,5 +226,54 @@ public class JsonUtil {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * toJsonString
+	 * @param obj
+	 * @return
+	 */
+	public static String toJsonString(Object obj) {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.serializeNulls();
+		Gson gson = gsonBuilder.create();
+		return gson.toJson(obj);
+	}
+
+	/**
+	 * toJsonString
+	 * @param obj
+	 * @param includeNullValues
+	 * @param disableHtmlEscaping
+	 * @return
+	 */
+	public static String toJsonString(Object obj, boolean includeNullValues, boolean disableHtmlEscaping) {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		if (includeNullValues) {
+			gsonBuilder.serializeNulls();
+		}
+		if (disableHtmlEscaping) {
+			gsonBuilder.disableHtmlEscaping();
+		}
+		Gson gson = gsonBuilder.create();
+		return gson.toJson(obj);
+	}
+
+	/**
+	 * toJsonStringJackson
+	 * 
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public static String toJsonStringJackson(Object obj) throws Exception {
+		ObjectWriter ow = new ObjectMapper().writer();
+		String json;
+		try {
+			json = ow.writeValueAsString(obj);
+		} catch (JsonProcessingException e) {
+			throw new Exception("Json processing error");
+		}
+		return json;
 	}
 }
